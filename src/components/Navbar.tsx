@@ -9,10 +9,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-glass-border bg-glass-bg/80 backdrop-blur-lg">
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-sm shadow-soft">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-gradient-primary" />
+          <div className="h-8 w-8 rounded-lg bg-gradient-primary shadow-medium" />
           <span className="text-xl font-bold text-foreground">Skill Match</span>
         </Link>
         
@@ -33,7 +33,7 @@ const Navbar = () => {
 
         <Button 
           onClick={handleConnectWallet}
-          className="bg-gradient-primary hover:shadow-glow transition-all duration-300"
+          className="bg-gradient-primary hover:shadow-medium transition-all duration-300"
         >
           <Wallet className="mr-2 h-4 w-4" />
           Connect Wallet
