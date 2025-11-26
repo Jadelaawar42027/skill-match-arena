@@ -8,26 +8,29 @@ import Partners from "./pages/Partners";
 import Games from "./pages/Games";
 import ChessGame from "./pages/ChessGame";
 import NotFound from "./pages/NotFound";
+import { WalletProvider } from "./components/WalletProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/partners" element={<Partners />} />
-          <Route path="/games" element={<Games />} />
-          <Route path="/games/chess" element={<ChessGame />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <WalletProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/partners" element={<Partners />} />
+            <Route path="/games" element={<Games />} />
+            <Route path="/games/chess" element={<ChessGame />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </WalletProvider>
 );
 
 export default App;

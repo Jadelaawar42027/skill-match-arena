@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Wallet } from "lucide-react";
+import { useWallet } from "./WalletProvider";
 
 const Navbar = () => {
-  const handleConnectWallet = () => {
-    // Placeholder for wallet connection logic
-    console.log("Connect wallet clicked");
-  };
+  const { wallet, connectWallet } = useWallet();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-sm shadow-soft">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        {/* Brand / Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-gradient-primary shadow-medium" />
           <span className="text-xl font-bold text-foreground">Skill Match</span>
         </Link>
         
+        {/* Navigation Links */}
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
             Home
@@ -31,12 +31,13 @@ const Navbar = () => {
           </a>
         </div>
 
+        {/* Wallet Button */}
         <Button 
-          onClick={handleConnectWallet}
-          className="bg-gradient-primary hover:shadow-medium transition-all duration-300"
+          onClick={connectWallet}
+          className="bg-gradient-primary hover:shadow-medium transition-all duration-300 flex items-center"
         >
           <Wallet className="mr-2 h-4 w-4" />
-          Connect Wallet
+          {wallet ? wallet.slice(0, 6) + "..." + wallet.slice(-4) : "Connect Wallet"}
         </Button>
       </div>
     </nav>
