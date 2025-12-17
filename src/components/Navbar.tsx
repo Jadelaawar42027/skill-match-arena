@@ -5,7 +5,7 @@ import { Wallet, Plus } from "lucide-react";
 import { ethers } from "ethers";
 import SkillMatchEscrowABI from "./SkillMatchEscrow.json"; // adjust path if needed
 
-const CONTRACT_ADDRESS = "0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8";
+const CONTRACT_ADDRESS = "0x1FEB709EEB97A022401a249Ec816342F65515b0F";
 
 const Navbar = () => {
   const [account, setAccount] = useState<string | null>(null);
