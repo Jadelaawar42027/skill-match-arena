@@ -66,7 +66,10 @@ const ChessGame = ({ account }: { account: string | null }) => {
           <h1 className="text-5xl font-bold text-center text-foreground mb-6">
             Play Chess for ETH
           </h1>
-
+          <h1 className="text-5xl font-bold text-center text-foreground mb-6">
+            (0.01 ETH = $30)
+          </h1>
+          
           {!joined && (
             <div className="p-8 rounded-2xl bg-glass-bg/80 border border-glass-border space-y-4">
               <Input
