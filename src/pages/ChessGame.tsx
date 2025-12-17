@@ -4,32 +4,47 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ethers } from "ethers";
-import SkillMatchEscrowABI from "./SkillMatchEscrow.json"; // your ABI JSON
+import { useWallet } from "@/components/WalletProvider";
+import SkillMatchEscrowABI from "./SkillMatchEscrow.json";
 
 const CONTRACT_ADDRESS = "0x1FEB709EEB97A022401a249Ec816342F65515b0F";
 
-const ChessGame = ({ account }: { account: string | null }) => {
+const ChessGame = () => {
+  const { wallet, provider } = useWallet();
+
   const [matchId, setMatchId] = useState("");
   const [joined, setJoined] = useState(false);
   const [gameLink, setGameLink] = useState("");
   const [winner, setWinner] = useState("");
 
   const handleJoinMatch = async () => {
-    if (!account) return alert("Connect wallet first!");
-    if (!matchId) return alert("Enter match ID!");
+    if (!wallet || !provider) {
+      alert("Connect wallet first!");
+      return;
+    }
+
+    if (!matchId) {
+      alert("Enter match ID!");
+      return;
+    }
 
     try {
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, SkillMatchEscrowABI.abi, signer);
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        SkillMatchEscrowABI.abi,
+        signer
+      );
 
-      // Fetch match stake for sending
-      const matchInfo = await contract.matches(matchId);
-      const tx = await contract.joinMatch(matchId, { value: matchInfo.stake });
+      const matchInfo = await contract.matches(BigInt(matchId));
+
+      const tx = await contract.joinMatch(BigInt(matchId), {
+        value: matchInfo.stake,
+      });
+
       await tx.wait();
-
-      alert("Joined match successfully!");
       setJoined(true);
+      alert("Joined match successfully!");
     } catch (err: any) {
       console.error(err);
       alert("Failed to join match: " + err.message);
@@ -37,20 +52,31 @@ const ChessGame = ({ account }: { account: string | null }) => {
   };
 
   const handleSubmitResult = async () => {
-    if (!gameLink) return alert("Paste your game link!");
+    if (!wallet || !provider) {
+      alert("Connect wallet first!");
+      return;
+    }
 
-    // For demo, randomly pick winner or hardcode "White"
-    const winnerAddress = account; // just use the current connected wallet for demo
-    setWinner("White"); // show in UI
+    if (!gameLink) {
+      alert("Paste your game link!");
+      return;
+    }
 
     try {
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, SkillMatchEscrowABI.abi, signer);
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        SkillMatchEscrowABI.abi,
+        signer
+      );
 
-      const tx = await contract.finalizeMatch(matchId, winnerAddress);
+      const tx = await contract.finalizeMatch(
+        BigInt(matchId),
+        wallet
+      );
+
       await tx.wait();
-
+      setWinner("You");
       alert("Winner finalized and funds distributed!");
     } catch (err: any) {
       console.error(err);
@@ -60,14 +86,12 @@ const ChessGame = ({ account }: { account: string | null }) => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <Navbar account={account} />
+      <Navbar />
+
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-3xl mx-auto space-y-8">
-          <h1 className="text-5xl font-bold text-center text-foreground mb-6">
+          <h1 className="text-5xl font-bold text-center text-foreground">
             Play Chess for ETH
-          </h1>
-          <h1 className="text-5xl font-bold text-center text-foreground mb-6">
-            (0.01 ETH = $30)
           </h1>
 
           {!joined && (
@@ -89,7 +113,7 @@ const ChessGame = ({ account }: { account: string | null }) => {
           {joined && !winner && (
             <div className="p-8 rounded-2xl bg-glass-bg/80 border border-glass-border space-y-4">
               <Input
-                placeholder="Paste game link (any URL)"
+                placeholder="Paste game link"
                 value={gameLink}
                 onChange={(e) => setGameLink(e.target.value)}
               />
@@ -109,6 +133,7 @@ const ChessGame = ({ account }: { account: string | null }) => {
           )}
         </div>
       </div>
+
       <Footer />
     </div>
   );
