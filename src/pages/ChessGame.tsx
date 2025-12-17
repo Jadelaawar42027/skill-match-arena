@@ -15,34 +15,23 @@ const ChessGame = () => {
   const [matchId, setMatchId] = useState("");
   const [joined, setJoined] = useState(false);
   const [gameLink, setGameLink] = useState("");
+  const [winnerAddress, setWinnerAddress] = useState(""); 
   const [winner, setWinner] = useState("");
 
+  // Join a match
   const handleJoinMatch = async () => {
-    if (!wallet || !provider) {
-      alert("Connect wallet first!");
-      return;
-    }
-
-    if (!matchId) {
-      alert("Enter match ID!");
-      return;
-    }
+    if (!wallet || !provider) return alert("Connect wallet first!");
+    if (!matchId) return alert("Enter match ID!");
 
     try {
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        SkillMatchEscrowABI.abi,
-        signer
-      );
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, SkillMatchEscrowABI, signer);
 
       const matchInfo = await contract.matches(BigInt(matchId));
 
-      const tx = await contract.joinMatch(BigInt(matchId), {
-        value: matchInfo.stake,
-      });
-
+      const tx = await contract.joinMatch(BigInt(matchId), { value: matchInfo.stake });
       await tx.wait();
+
       setJoined(true);
       alert("Joined match successfully!");
     } catch (err: any) {
@@ -51,32 +40,22 @@ const ChessGame = () => {
     }
   };
 
+  // Finalize match with winner
   const handleSubmitResult = async () => {
-    if (!wallet || !provider) {
-      alert("Connect wallet first!");
-      return;
-    }
-
-    if (!gameLink) {
-      alert("Paste your game link!");
-      return;
-    }
+    if (!wallet || !provider) return alert("Connect wallet first!");
+    if (!matchId) return alert("Enter match ID!");
+    if (!gameLink) return alert("Paste your game link!");
+    if (!winnerAddress) return alert("Enter winner wallet address!");
 
     try {
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        SkillMatchEscrowABI.abi,
-        signer
-      );
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, SkillMatchEscrowABI, signer);
 
-      const tx = await contract.finalizeMatch(
-        BigInt(matchId),
-        wallet
-      );
-
+      // Call finalizeMatch on the contract
+      const tx = await contract.finalizeMatch(BigInt(matchId), winnerAddress);
       await tx.wait();
-      setWinner("You");
+
+      setWinner(winnerAddress);
       alert("Winner finalized and funds distributed!");
     } catch (err: any) {
       console.error(err);
@@ -94,6 +73,7 @@ const ChessGame = () => {
             Play Chess for ETH
           </h1>
 
+          {/* Join Match */}
           {!joined && (
             <div className="p-8 rounded-2xl bg-glass-bg/80 border border-glass-border space-y-4">
               <Input
@@ -110,6 +90,7 @@ const ChessGame = () => {
             </div>
           )}
 
+          {/* Submit Result / Finalize Match */}
           {joined && !winner && (
             <div className="p-8 rounded-2xl bg-glass-bg/80 border border-glass-border space-y-4">
               <Input
@@ -117,15 +98,21 @@ const ChessGame = () => {
                 value={gameLink}
                 onChange={(e) => setGameLink(e.target.value)}
               />
+              <Input
+                placeholder="Winner wallet address"
+                value={winnerAddress}
+                onChange={(e) => setWinnerAddress(e.target.value)}
+              />
               <Button
                 onClick={handleSubmitResult}
                 className="bg-gradient-primary w-full hover:shadow-glow"
               >
-                Submit Result
+                Finalize Match
               </Button>
             </div>
           )}
 
+          {/* Display Winner */}
           {winner && (
             <div className="p-8 rounded-2xl bg-green-600/20 border border-green-600 text-green-900 text-center font-bold text-xl">
               Winner is: {winner} 🏆
